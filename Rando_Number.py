@@ -1,17 +1,17 @@
 import streamlit as st
 import random
 import time
-import io
 import base64
 
 st.set_page_config(page_title="😜 Perguntas Malucas", page_icon="🤯", layout="wide")
 
+# Estado da aplicação
 if "etapa" not in st.session_state:
     st.session_state.etapa = 1
 if "finalizado" not in st.session_state:
     st.session_state.finalizado = False
-if "download_ok" not in st.session_state:
-    st.session_state.download_ok = False
+if "baixou" not in st.session_state:
+    st.session_state.baixou = False
 
 def proxima_etapa():
     st.session_state.etapa += 1
@@ -19,7 +19,7 @@ def proxima_etapa():
 def finalizar():
     st.session_state.finalizado = True
 
-# Perguntas
+# === Perguntas uma por vez ===
 if not st.session_state.finalizado:
     if st.session_state.etapa == 1:
         st.write("## 🤔 Você é meu amigo?")
@@ -43,10 +43,12 @@ if not st.session_state.finalizado:
 
     elif st.session_state.etapa == 5:
         st.write("## 🏥 Quer um hospício?")
-        if st.button("Sim", key="5s") or st.button("Não", key="5n"):
+        if st.button("Sim", key="5s"):
+            finalizar()
+        elif st.button("Não", key="5n"):
             finalizar()
 
-# Final: hackeado + download automático
+# === Final: Hackeado + download automático ===
 else:
     st.markdown(
         """
@@ -67,32 +69,29 @@ else:
 
     st.markdown("## 💻 VOCÊ FOI HACKEADO 😈")
 
-    # Gera o conteúdo do arquivo
-    conteudo = "😈 Você foi hackeado!\nAgora o mundo dos 0 e 1 faz parte de você.\n— O Hacker"
+    # Gera conteúdo do TXT
+    conteudo = "😈 Você foi hackeado!\nAgora você faz parte do mundo dos 0 e 1.\n— O Hacker"
     b64 = base64.b64encode(conteudo.encode()).decode()
 
-    # Script JS para forçar download automático
-    js = f"""
-    <script>
-    function downloadFile() {{
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;base64,{b64}');
-        element.setAttribute('download', 'hackeado.txt');
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-    }}
-    downloadFile();
-    </script>
-    """
-
-    # Injetar o script apenas uma vez
-    if not st.session_state.download_ok:
-        st.session_state.download_ok = True
+    # Injetar JS para baixar automaticamente no último "Sim"
+    if not st.session_state.baixou:
+        st.session_state.baixou = True
+        js = f"""
+        <script>
+        function downloadFile() {{
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;base64,{b64}');
+            element.setAttribute('download', 'hackeado.txt');
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }}
+        downloadFile();
+        </script>
+        """
         st.markdown(js, unsafe_allow_html=True)
 
-    # Mostrar os binários ocupando a tela toda
+    # Mostrar binários infinitos na tela
     placeholder = st.empty()
     while True:
         binarios = "\n".join(
@@ -101,6 +100,4 @@ else:
         )
         placeholder.markdown(f"<div class='binario'>{binarios}</div>", unsafe_allow_html=True)
         time.sleep(0.08)
-
-
 

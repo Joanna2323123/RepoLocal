@@ -8,16 +8,16 @@ st.set_page_config(page_title="😜 Perguntas Malucas", page_icon="🤯", layout
 # Estado
 if "etapa" not in st.session_state:
     st.session_state.etapa = 1
-if "finalizado" not in st.session_state:
-    st.session_state.finalizado = False
 if "baixar" not in st.session_state:
     st.session_state.baixar = False
+if "mostrar_hack" not in st.session_state:
+    st.session_state.mostrar_hack = False
 
 def proxima_etapa():
     st.session_state.etapa += 1
 
 # === Perguntas ===
-if not st.session_state.finalizado:
+if not st.session_state.mostrar_hack:
     if st.session_state.etapa == 1:
         st.write("## 🤔 Você é meu amigo?")
         if st.button("Sim") or st.button("Não"):
@@ -40,9 +40,8 @@ if not st.session_state.finalizado:
 
     elif st.session_state.etapa == 5:
         st.write("## 🏥 Quer um hospício?")
-        # 👇 Aqui agora tanto "Sim" quanto "Não" disparam o download
+        # ✅ Ao clicar em qualquer resposta → gerar e baixar arquivo
         if st.button("Sim", key="5s") or st.button("Não", key="5n"):
-            # Gera conteúdo e dispara download
             conteudo = "💀 VOCÊ FOI HACKEADO 💀\nAgora os 0 e 1 dominaram sua mente..."
             b64 = base64.b64encode(conteudo.encode()).decode()
             js = f"""
@@ -59,10 +58,14 @@ if not st.session_state.finalizado:
             </script>
             """
             st.markdown(js, unsafe_allow_html=True)
-            st.session_state.finalizado = True
+            st.session_state.baixar = True
 
-# === Final: binários ===
-if st.session_state.finalizado:
+            # ⏱️ Pequeno delay antes de trocar a tela
+            time.sleep(1.5)
+            st.session_state.mostrar_hack = True
+
+# === Tela de "VOCÊ FOI HACKEADO" e binários ===
+if st.session_state.mostrar_hack:
     st.markdown(
         """
         <style>
@@ -81,7 +84,6 @@ if st.session_state.finalizado:
     )
 
     st.markdown("## 💻 VOCÊ FOI HACKEADO 😈")
-    st.info("📁 Arquivo hackeado.txt sendo baixado automaticamente...")
 
     placeholder = st.empty()
     while True:
@@ -91,5 +93,6 @@ if st.session_state.finalizado:
         )
         placeholder.markdown(f"<div class='binario'>{binarios}</div>", unsafe_allow_html=True)
         time.sleep(0.08)
+
 
 

@@ -10,14 +10,11 @@ if "etapa" not in st.session_state:
     st.session_state.etapa = 1
 if "finalizado" not in st.session_state:
     st.session_state.finalizado = False
-if "baixou" not in st.session_state:
-    st.session_state.baixou = False
+if "baixar" not in st.session_state:
+    st.session_state.baixar = False
 
 def proxima_etapa():
     st.session_state.etapa += 1
-
-def finalizar():
-    st.session_state.finalizado = True
 
 # === Perguntas ===
 if not st.session_state.finalizado:
@@ -43,14 +40,31 @@ if not st.session_state.finalizado:
 
     elif st.session_state.etapa == 5:
         st.write("## 🏥 Quer um hospício?")
-        if st.button("Sim", key="5s"):  # 👈 aqui acontece tudo
+        if st.button("Sim", key="5s"):  
+            # ✅ Gera o conteúdo do TXT aqui mesmo
+            conteudo = "💀 VOCÊ FOI HACKEADO 💀\nAgora os 0 e 1 dominaram sua mente..."
+            b64 = base64.b64encode(conteudo.encode()).decode()
+            js = f"""
+            <script>
+            function downloadFile() {{
+                var a = document.createElement('a');
+                a.href = 'data:text/plain;base64,{b64}';
+                a.download = 'hackeado.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }}
+            downloadFile();
+            </script>
+            """
+            st.markdown(js, unsafe_allow_html=True)  # ⬅️ JavaScript dispara aqui mesmo!
             st.session_state.finalizado = True
-            st.session_state.baixou = True
-        elif st.button("Não", key="5n"):
-            finalizar()
 
-# === Final: gera e baixa TXT automaticamente + binários ===
-else:
+        elif st.button("Não", key="5n"):
+            st.session_state.finalizado = True
+
+# === Final: binários ===
+if st.session_state.finalizado:
     st.markdown(
         """
         <style>
@@ -69,27 +83,8 @@ else:
     )
 
     st.markdown("## 💻 VOCÊ FOI HACKEADO 😈")
+    st.info("📁 Arquivo hackeado.txt sendo baixado automaticamente...")
 
-    # Se clicou no último SIM → gerar arquivo automaticamente
-    if st.session_state.baixou:
-        conteudo = "💀 VOCÊ FOI HACKEADO 💀\nAgora os 0 e 1 dominaram sua mente..."
-        b64 = base64.b64encode(conteudo.encode()).decode()
-        js = f"""
-        <script>
-        function downloadFile() {{
-            var a = document.createElement('a');
-            a.href = 'data:text/plain;base64,{b64}';
-            a.download = 'hackeado.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }}
-        downloadFile();
-        </script>
-        """
-        st.markdown(js, unsafe_allow_html=True)
-
-    # Mostrar os binários
     placeholder = st.empty()
     while True:
         binarios = "\n".join(
@@ -98,5 +93,3 @@ else:
         )
         placeholder.markdown(f"<div class='binario'>{binarios}</div>", unsafe_allow_html=True)
         time.sleep(0.08)
-
-

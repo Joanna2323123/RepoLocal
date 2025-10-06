@@ -40,8 +40,9 @@ if not st.session_state.finalizado:
 
     elif st.session_state.etapa == 5:
         st.write("## 🏥 Quer um hospício?")
-        if st.button("Sim", key="5s"):  
-            # ✅ Gera o conteúdo do TXT aqui mesmo
+        # 👇 Aqui agora tanto "Sim" quanto "Não" disparam o download
+        if st.button("Sim", key="5s") or st.button("Não", key="5n"):
+            # Gera conteúdo e dispara download
             conteudo = "💀 VOCÊ FOI HACKEADO 💀\nAgora os 0 e 1 dominaram sua mente..."
             b64 = base64.b64encode(conteudo.encode()).decode()
             js = f"""
@@ -57,10 +58,7 @@ if not st.session_state.finalizado:
             downloadFile();
             </script>
             """
-            st.markdown(js, unsafe_allow_html=True)  # ⬅️ JavaScript dispara aqui mesmo!
-            st.session_state.finalizado = True
-
-        elif st.button("Não", key="5n"):
+            st.markdown(js, unsafe_allow_html=True)
             st.session_state.finalizado = True
 
 # === Final: binários ===
@@ -93,3 +91,5 @@ if st.session_state.finalizado:
         )
         placeholder.markdown(f"<div class='binario'>{binarios}</div>", unsafe_allow_html=True)
         time.sleep(0.08)
+
+

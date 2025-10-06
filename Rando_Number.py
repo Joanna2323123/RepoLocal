@@ -19,7 +19,7 @@ def finalizar():
 # Exibir perguntas uma por vez
 if not st.session_state.finalizado:
     if st.session_state.etapa == 1:
-        st.write("## 🤔 Você é meu amigo?")
+        st.write("## 🤔 Louco?")
         if st.button("Sim") or st.button("Não"):
             proxima_etapa()
 
@@ -73,3 +73,4 @@ else:
         )
         placeholder.markdown(f"<div class='binario'>{binarios}</div>", unsafe_allow_html=True)
         time.sleep(0.1)
+

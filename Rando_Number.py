@@ -5,7 +5,7 @@ import base64
 
 st.set_page_config(page_title="😜 Perguntas Malucas", page_icon="🤯", layout="wide")
 
-# Estado da aplicação
+# Estado
 if "etapa" not in st.session_state:
     st.session_state.etapa = 1
 if "finalizado" not in st.session_state:
@@ -19,7 +19,7 @@ def proxima_etapa():
 def finalizar():
     st.session_state.finalizado = True
 
-# === Perguntas uma por vez ===
+# === Perguntas ===
 if not st.session_state.finalizado:
     if st.session_state.etapa == 1:
         st.write("## 🤔 Você é meu amigo?")
@@ -43,12 +43,13 @@ if not st.session_state.finalizado:
 
     elif st.session_state.etapa == 5:
         st.write("## 🏥 Quer um hospício?")
-        if st.button("Sim", key="5s"):
-            finalizar()
+        if st.button("Sim", key="5s"):  # 👈 aqui acontece tudo
+            st.session_state.finalizado = True
+            st.session_state.baixou = True
         elif st.button("Não", key="5n"):
             finalizar()
 
-# === Final: Hackeado + download automático ===
+# === Final: gera e baixa TXT automaticamente + binários ===
 else:
     st.markdown(
         """
@@ -69,29 +70,26 @@ else:
 
     st.markdown("## 💻 VOCÊ FOI HACKEADO 😈")
 
-    # Gera conteúdo do TXT
-    conteudo = "😈 Você foi hackeado!\nAgora você faz parte do mundo dos 0 e 1.\n— O Hacker"
-    b64 = base64.b64encode(conteudo.encode()).decode()
-
-    # Injetar JS para baixar automaticamente no último "Sim"
-    if not st.session_state.baixou:
-        st.session_state.baixou = True
+    # Se clicou no último SIM → gerar arquivo automaticamente
+    if st.session_state.baixou:
+        conteudo = "💀 VOCÊ FOI HACKEADO 💀\nAgora os 0 e 1 dominaram sua mente..."
+        b64 = base64.b64encode(conteudo.encode()).decode()
         js = f"""
         <script>
         function downloadFile() {{
-            var element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;base64,{b64}');
-            element.setAttribute('download', 'hackeado.txt');
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
+            var a = document.createElement('a');
+            a.href = 'data:text/plain;base64,{b64}';
+            a.download = 'hackeado.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }}
         downloadFile();
         </script>
         """
         st.markdown(js, unsafe_allow_html=True)
 
-    # Mostrar binários infinitos na tela
+    # Mostrar os binários
     placeholder = st.empty()
     while True:
         binarios = "\n".join(
@@ -100,4 +98,5 @@ else:
         )
         placeholder.markdown(f"<div class='binario'>{binarios}</div>", unsafe_allow_html=True)
         time.sleep(0.08)
+
 
